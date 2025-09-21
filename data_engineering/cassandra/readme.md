@@ -54,7 +54,7 @@ Dữ liệu CSV đặt trong thư mục ./init/:
 docker-compose da import du lieu mock test
 
 
-## 4. Kiểm tra dữ liệu & Query thu
+## 4. Kiểm tra dữ liệu & Query thử
 ```bash
 # Truy cập cqlsh của từng node:
 docker exec -it cassandra-node1 cqlsh
