@@ -1,0 +1,90 @@
+version: '3.3'
+
+services:
+  cassandra-node1:
+    image: cassandra:4.1
+    container_name: cassandra-node1
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node1
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_SEEDS=cassandra-node1
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=256M
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./init:/init
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cassandra-node2:
+    image: cassandra:4.1
+    container_name: cassandra-node2
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node2
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_SEEDS=cassandra-node1
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=256M
+    depends_on:
+      cassandra-node1:
+        condition: service_healthy
+    ports:
+      - "9043:9042"
+    volumes:
+      - ./init:/init
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cassandra-node3:
+    image: cassandra:4.1
+    container_name: cassandra-node3
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_LISTEN_ADDRESS=cassandra-node3
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+      - CASSANDRA_SEEDS=cassandra-node1
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=256M
+    depends_on:
+      cassandra-node2:
+        condition: service_healthy
+    ports:
+      - "9044:9042"
+    volumes:
+      - ./init:/init
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cassandra-init:
+    image: cassandra:4.1
+    depends_on: 
+      cassandra-node1:
+        condition: service_healthy
+      # cassandra-node2:
+      #   condition: service_healthy
+      # cassandra-node3:
+      #   condition: service_healthy
+    volumes:
+      - ./init:/init
+    entrypoint: ["/bin/bash", "/init/init.sh"]
