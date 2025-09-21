@@ -143,4 +143,4 @@ docker exec -it cassandra-node2 cqlsh -e "SELECT * FROM retail.customers LIMIT 3
 |----------------------------|--------------------------------------------------------|
 | Không hỗ trợ JOIN          | Không thể JOIN nhiều bảng như SQL truyền thống         |
 | Không hỗ trợ GROUP BY      | Các query aggregation phức tạp không dùng được         |
-| Không ACID                 | Không phù hợp với giao dịch tài chính nghiêm ngặt      |
+| Không ACID                 | Không phù hợp       |
