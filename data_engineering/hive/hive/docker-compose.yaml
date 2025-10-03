@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  hive-server:
+    image: apache/hive:3.1.3
+    container_name: hive3
+    ports:
+      - "10000:10000"  # HiveServer2 Thrift port
+      - "10002:10002"  # HiveServer2 WebUI port
+    environment:
+      - SERVICE_NAME=hiveserver2
+    command: >
+      bash -c "
+        schematool -dbType derby -initSchema &&
+        hiveserver2
+      "
+    volumes:
+      - ./data:/init
+    networks:
+      - hive-net
+
+  hive-init:
+    image: apache/hive:3.1.3
+    container_name: hive-init
+    depends_on:
+      - hive-server
+    volumes:
+      - ./data:/init
+    networks:
+      - hive-net
+    entrypoint: >
+      bash -c "
+        echo '⏳ Waiting for HiveServer2 to be ready...';
+        sleep 30;
+
+        echo '🚀 Running init.hql...';
+        beeline -u jdbc:hive2://hive-server:10000/default -n hive -f /init/init.hql;
+
+        echo '✅ Done loading data.'
+      "
+
+
+networks:
+ hive-net:
