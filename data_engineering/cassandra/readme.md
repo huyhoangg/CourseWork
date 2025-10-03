@@ -54,7 +54,7 @@ Dữ liệu CSV đặt trong thư mục ./init/:
 docker-compose da import du lieu mock test
 
 
-## 4. Kiểm tra dữ liệu & Query thu
+## 4. Kiểm tra dữ liệu & Query thử
 ```bash
 # Truy cập cqlsh của từng node:
 docker exec -it cassandra-node1 cqlsh
@@ -143,4 +143,4 @@ docker exec -it cassandra-node2 cqlsh -e "SELECT * FROM retail.customers LIMIT 3
 |----------------------------|--------------------------------------------------------|
 | Không hỗ trợ JOIN          | Không thể JOIN nhiều bảng như SQL truyền thống         |
 | Không hỗ trợ GROUP BY      | Các query aggregation phức tạp không dùng được         |
-| Không ACID                 | Không phù hợp với giao dịch tài chính nghiêm ngặt      |
+| Không ACID                 | Không phù hợp       |
