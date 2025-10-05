@@ -1,0 +1,46 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    command: --local-infile=1 --secure-file-priv=""
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: retail
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/data
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-server
+    depends_on:
+      - mysql
+    ports:
+      - "10000:10000"
+    volumes:
+      - ./home/user2/Downloads/mysql-connector-java-8.0.30.jar:/opt/hive/lib/mysql-connector-java.jar
+      - ./data/init.hql:/init.hql
+    entrypoint: >
+      /bin/bash -c "
+        /opt/hive/bin/hiveserver2 &
+
+        echo '🔄 Waiting for HiveServer2 to be ready...';
+        for i in {1..30}; do
+          nc -z 127.0.0.1 10000 && echo '✅ HiveServer2 is ready!' && break
+          echo '⏳ Waiting...'
+          sleep 5
+        done
+
+        /opt/hive/bin/beeline -u jdbc:hive2://localhost:10000 -f /init.hql || echo '❌ Failed to run init.hql'
+        tail -f /dev/null
+      "
+
+
+volumes:
+  metastore_db:

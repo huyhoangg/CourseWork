@@ -65,3 +65,18 @@ STORED AS TEXTFILE
 LOCATION '/tmp/transactions';
 
 LOAD DATA LOCAL INPATH '/init/transactions.csv' INTO TABLE transactions;
+
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS bank (
+  tx_date STRING,        
+  domain STRING,
+  location STRING,
+  value DECIMAL(18,2),
+  tx_count INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION '/tmp/bank';
+LOAD DATA LOCAL INPATH '/init/bank.csv' INTO TABLE bank;
